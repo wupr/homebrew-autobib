@@ -1,0 +1,53 @@
+name: formula bump
+
+on:
+  workflow_dispatch:
+    inputs:
+      formula:
+        required: true
+        type: string
+      release_tag:
+        required: true
+        type: string
+
+jobs:
+  bump-formula-pr:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Get release version
+        env:
+          RELEASE_TAG: ${{ inputs.release_tag }}
+        shell: bash
+        run: |
+          if [[ "$RELEASE_TAG" =~ ^v.* ]]; then
+            release_version="${RELEASE_TAG:1}"
+            echo "Release version: $release_version."
+            echo "release_version=$release_version" >> "$GITHUB_ENV"
+          else
+            echo "Unrecognised release tag: $RELEASE_TAG."
+            exit 1
+          fi
+
+      - name: Set up Homebrew
+        id: set-up-homebrew
+        uses: Homebrew/actions/setup-homebrew@main
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up git
+        uses: Homebrew/actions/git-user-config@main
+
+      - name: Cache Homebrew Bundler RubyGems
+        uses: actions/cache@v5
+        with:
+          path: ${{ steps.set-up-homebrew.outputs.gems-path }}
+          key: brew-rubygems-${{ steps.set-up-homebrew.outputs.gems-hash }}
+          restore-keys: brew-rubygems-
+
+      - name: Bump formula and create PR
+        env:
+          HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          brew bump-formula-pr --no-fork --strict --online \
+            --version ${{ env.release_version }} "$GITHUB_REPOSITORY/${{ inputs.formula }}"
