@@ -46,6 +46,8 @@ jobs:
           restore-keys: brew-rubygems-
 
       - name: Bump formula and create PR
+        env:
+          HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.HOMEBREW_TAP_PR_ACCESS_TOKEN }}
         shell: bash
         run: |
           brew bump-formula-pr --no-fork --strict --online --no-browse \
