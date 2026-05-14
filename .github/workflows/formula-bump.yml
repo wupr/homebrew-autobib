@@ -15,7 +15,6 @@ jobs:
     runs-on: ubuntu-24.04
     permissions:
       contents: write
-      pull-requests: write
     steps:
       - name: Get release version
         env:
@@ -52,5 +51,5 @@ jobs:
           HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: bash
         run: |
-          brew bump-formula-pr --no-fork --strict --online \
+          brew bump-formula-pr --no-fork --strict --online --no-browse \
             --version ${{ env.release_version }} "$GITHUB_REPOSITORY/${{ inputs.formula }}"
