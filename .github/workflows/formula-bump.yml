@@ -13,6 +13,9 @@ on:
 jobs:
   bump-formula-pr:
     runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - name: Get release version
         env:
