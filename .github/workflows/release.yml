@@ -2,6 +2,7 @@ name: release
 
 on:
   pull_request_target:
+    # Runs on the default branch of the target repo
     types:
       - labeled
 
