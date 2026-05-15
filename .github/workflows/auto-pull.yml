@@ -11,7 +11,7 @@ on:
       - "bump-*"
 
 jobs:
-  label-pr-pull:
+  label-pr:
     environment: pr-automation
     if: >
       github.event.workflow_run.event == 'pull_request' &&
@@ -25,13 +25,12 @@ jobs:
           BRANCH: ${{ github.event.workflow_run.head_branch }}
         shell: bash
         run: |
-          pr_json=$(
+          pr_url=$(
             gh pr view "$BRANCH" \
               --repo ${{ github.repository }} \
               --json url,state,labels \
               --jq 'if .state == "OPEN" and any(.labels[].name; . == "auto-pull") then .url else "" end'
           )
-          pr_url=$(echo "$pr_json" | jq 'if any(.labels[]; . == "auto-pull") and .state == "OPEN" then .url else "" end')
           echo "pr_url=$pr_url" >> "$GITHUB_OUTPUT"
 
       - name: Determine next step
