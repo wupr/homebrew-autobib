@@ -8,12 +8,12 @@ class Autobib < Formula
   head "https://github.com/autobib/autobib.git", branch: "main"
 
   bottle do
-    root_url "https://github.com/wupr/homebrew-autobib/releases/download/autobib-0.5.1"
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "bc414cfeaf8b74e10206f65c2ed44edfbac85f5a8c3fea64df608dbec8783063"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia: "832bedbe79bb0c885cf1b4434a96c720cc77ba846d616c7d78774e586370d4fe"
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "36fa562af047c558cf234a8d852b3593e75e5cd2ae20740982bda79ebd188c58"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "941ea31a6a28ed4853adf0f1abe31f80682d2fb34d2cf017c8e9253a62e8aae7"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "4a5b32413d66c4db0d3257141f31cccc95e38d364c704ba7df3811a65f94ed40"
+    root_url "https://github.com/wupr/homebrew-autobib/releases/download/autobib-0.6.0"
+    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "e061ebaf86e28020b0c0980ced7d4038b1b09b9b23eb07d8b1aad2cfef4e18b3"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "39e218480339f848f9a8c6e93b91d66186735ed5bec3a7041443f89da1021693"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "2d01b904b5a7b06ef162bff9a61c203eec4756f6b75cb9484457f0f10c6ab59d"
+    sha256 cellar: :any_skip_relocation, arm64_linux:   "a9e56c0e20b53ba378fe01169c11b4ab9c64d23b6cb394ba69afc352641aa11a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "e43faa6a5c72742dea8d4550562daa9280bc4a1aee432a27b7aec8c1c8b1b7a5"
   end
 
   depends_on "cargo-about" => :build
