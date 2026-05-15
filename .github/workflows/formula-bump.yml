@@ -80,5 +80,4 @@ jobs:
         shell: bash
         run: |
           gh pr edit ${{ steps.bump.outputs.pr_url }} \
-            --add-label 'auto-pull' \
-            --repo "$GITHUB_REPOSITORY"
+            --add-label 'auto-pull'

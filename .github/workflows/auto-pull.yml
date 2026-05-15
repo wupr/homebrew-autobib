@@ -1,0 +1,77 @@
+name: auto-pull
+
+on:
+  workflow_run:
+    # Runs on the default branch
+    workflows:
+      - "tests"
+    types:
+      - completed
+    branches:
+      - "bump-*"
+
+jobs:
+  label-pr-pull:
+    environment: pr-automation
+    if: >
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.head_repository.full_name == github.repository
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Find PR associated with workflow run
+        id: get-pr
+        env:
+          BRANCH: ${{ github.event.workflow_run.head_branch }}
+        shell: bash
+        run: |
+          pr_json=$(
+            gh pr view "$BRANCH" \
+              --repo ${{ github.repository }} \
+              --json url,state,labels \
+              --jq 'if .state == "OPEN" and any(.labels[].name; . == "auto-pull") then .url else "" end'
+          )
+          pr_url=$(echo "$pr_json" | jq 'if any(.labels[]; . == "auto-pull") and .state == "OPEN" then .url else "" end')
+          echo "pr_url=$pr_url" >> "$GITHUB_OUTPUT"
+
+      - name: Determine next step
+        id: determine-action
+        env:
+          CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+          PR_URL: ${{ steps.get-pr.outputs.pr_url }}
+        shell: bash
+        run: |
+          if [[ -z "$PR_URL" ]]; then
+            next_step="none"
+          elif [[ "$CONCLUSION" == "success" || "$CONCLUSION" == "skipped" || "$CONCLUSION" == "neutral" ]]; then
+            pr_checks_ok=$(
+              gh pr checks "$PR_URL" \
+                --json 'bucket'
+                --jq 'all(.[].bucket; . == "pass" or . == "skipping")'
+            )
+            if [[ "$pr_checks_ok" == "true" ]]; then
+              next_step="apply-pr-pull"
+            else
+              next_step="none"
+            fi
+          else
+            next_step="remove-auto-pull"
+          fi
+          echo "next_step=$next_step" >> "$GITHUB_OUTPUT"
+
+      - name: Apply 'pr-pull' label
+        if: steps.get-pr.outputs.next_step == 'apply-pr-pull'
+        env:
+          GH_TOKEN: ${{ secrets.HOMEBREW_TAP_PR_ACCESS_TOKEN }}
+        shell: bash
+        run: |
+          gh pr edit ${{ steps.get-pr.outputs.pr_url }} \
+            --add-label "pr-pull"
+
+      - name: Remove 'auto-pull' label
+        if: steps.get-pr.outputs.next_step == 'remove-auto-pull'
+        env:
+          GH_TOKEN: ${{ secrets.HOMEBREW_TAP_PR_ACCESS_TOKEN }}
+        shell: bash
+        run: |
+          gh pr edit ${{ steps.get-pr.outputs.pr_url }} \
+            --remove-label "auto-pull"
