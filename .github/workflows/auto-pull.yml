@@ -60,7 +60,7 @@ jobs:
           echo "next_step=$next_step" >> "$GITHUB_OUTPUT"
 
       - name: Apply 'pr-pull' label
-        if: steps.get-pr.outputs.next_step == 'apply-pr-pull'
+        if: steps.determine-action.outputs.next_step == 'apply-pr-pull'
         env:
           GH_TOKEN: ${{ secrets.HOMEBREW_TAP_PR_ACCESS_TOKEN }}
         shell: bash
@@ -69,7 +69,7 @@ jobs:
             --add-label "pr-pull"
 
       - name: Remove 'auto-pull' label
-        if: steps.get-pr.outputs.next_step == 'remove-auto-pull'
+        if: steps.determine-action.outputs.next_step == 'remove-auto-pull'
         env:
           GH_TOKEN: ${{ secrets.HOMEBREW_TAP_PR_ACCESS_TOKEN }}
         shell: bash
