@@ -45,7 +45,7 @@ jobs:
           elif [[ "$CONCLUSION" == "success" || "$CONCLUSION" == "skipped" || "$CONCLUSION" == "neutral" ]]; then
             pr_checks_ok=$(
               gh pr checks "$PR_URL" \
-                --json 'bucket'
+                --json 'bucket' \
                 --jq 'all(.[].bucket; . == "pass" or . == "skipping")'
             )
             if [[ "$pr_checks_ok" == "true" ]]; then
